@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Timeline — Hexapod RL</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0a;
+    --ink-soft: #1a1a1a;
+    --ink-muted: #444;
+    --ink-faint: #888;
+    --paper: #f5f5f3;
+    --paper-cool: #f0f0f4;
+    --border: #d0d0cc;
+    --border-soft: #e0e0dc;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* cursor desktop only */
+  @media (hover: hover) {
+    * { cursor: none; }
+    #cursor {
+      width: 8px; height: 8px;
+      background: var(--ink);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: width 0.2s, height 0.2s;
+    }
+    #cursor.expand {
+      width: 30px; height: 30px;
+      background: transparent;
+      border: 1px solid var(--ink);
+      transform: translate(-11px, -11px);
+    }
+  }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+
+  /* ══ HEADER — mobile base ══ */
+  header { padding: 32px 20px 24px; border-bottom: 1px solid var(--border); }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 400;
+    margin-bottom: 12px;
+  }
+  h1 em { font-style: italic; color: var(--ink-muted); }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--ink-faint);
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .stat { background: var(--paper); padding: 12px 8px; text-align: center; }
+  .stat-number { font-family: 'DM Serif Display', serif; font-size: 20px; display: block; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+
+  /* ══ PROGRESS BAR ══ */
+  .progress-bar-section {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .progress-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; flex-shrink: 0; }
+  .progress-track { flex: 1; height: 2px; background: var(--border); position: relative; margin-top: 16px; }
+  .progress-fill { height: 100%; background: var(--ink); width: 0%; transition: width 1.5s cubic-bezier(0.16,1,0.3,1); }
+  .month-markers { position: absolute; top: -16px; left: 0; right: 0; display: flex; justify-content: space-between; }
+  .month-marker { font-family: 'DM Mono', monospace; font-size: 7px; color: var(--ink-faint); }
+  .progress-percent { font-family: 'DM Serif Display', serif; font-size: 16px; flex-shrink: 0; }
+
+  /* ══ COUNTDOWN ══ */
+  .countdown-section {
+    padding: 28px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .countdown-left { margin-bottom: 20px; }
+  .countdown-left .eyebrow { color: rgba(245,245,243,0.4); margin-bottom: 4px; }
+  .countdown-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--paper); margin-bottom: 2px; }
+  .countdown-subtitle { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,245,243,0.4); }
+
+  .countdown-units {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    margin-bottom: 20px;
+  }
+  .countdown-unit { background: rgba(245,245,243,0.06); border: 1px solid rgba(245,245,243,0.1); padding: 14px 6px; text-align: center; }
+  .unit-number { font-family: 'DM Serif Display', serif; font-size: 28px; line-height: 1; color: var(--paper); display: block; }
+  .unit-label { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,245,243,0.4); margin-top: 6px; display: block; }
+
+  .countdown-urgency { display: flex; align-items: center; gap: 16px; }
+  .urgency-bar-wrap { flex: 1; }
+  .urgency-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,245,243,0.4); margin-bottom: 8px; display: block; }
+  .urgency-track { height: 1px; background: rgba(245,245,243,0.15); }
+  .urgency-fill { height: 100%; background: var(--paper); transition: width 1.5s cubic-bezier(0.16,1,0.3,1); }
+  .urgency-right { text-align: right; flex-shrink: 0; }
+  .urgency-pct { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--paper); display: block; }
+  .urgency-pct-label { font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(245,245,243,0.35); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* ══ COMPLETION BAR ══ */
+  .completion-bar {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-soft);
+    background: var(--paper-cool);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .completion-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; flex-shrink: 0; }
+  .completion-track { flex: 1; height: 1px; background: var(--border); }
+  .completion-fill { height: 100%; background: var(--ink); transition: width 0.5s ease; }
+  .completion-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-muted); white-space: nowrap; flex-shrink: 0; }
+
+  /* ══ MOBILE NAV TABS ══ */
+  .mobile-nav {
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .mobile-nav::-webkit-scrollbar { display: none; }
+  .mobile-nav-inner { display: flex; white-space: nowrap; min-width: max-content; }
+  .mobile-nav-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-decoration: none;
+    padding: 13px 14px;
+    border-right: 1px solid var(--border);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    display: block;
+  }
+  .mobile-nav-item.active, .mobile-nav-item:hover { color: var(--ink); border-bottom-color: var(--ink); background: var(--paper-cool); }
+
+  /* ══ STACK ACCORDION (mobile) ══ */
+  .stack-section { border-bottom: 1px solid var(--border); }
+  .stack-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-faint);
+    background: var(--paper); border: none; width: 100%; text-align: left;
+    cursor: pointer;
+  }
+  .stack-chevron { transition: transform 0.2s; }
+  .stack-toggle.open .stack-chevron { transform: rotate(180deg); }
+  .stack-items { display: none; padding: 4px 20px 16px; }
+  .stack-items.open { display: block; }
+  .stack-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border-soft); font-size: 13px; }
+  .stack-item:last-child { border-bottom: none; }
+  .stack-name { color: var(--ink-muted); }
+  .stack-badge { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.08em; color: var(--ink-faint); background: var(--paper-cool); border: 1px solid var(--border); padding: 2px 8px; border-radius: 2px; }
+
+  /* ══ PAGE BODY ══ */
+  .page-body { display: block; }
+
+  aside { display: none; }
+
+  /* ══ TIMELINE CONTENT ══ */
+  .timeline-content { padding: 24px 20px; }
+
+  .phase-block {
+    margin-bottom: 52px;
+    padding-bottom: 52px;
+    border-bottom: 1px solid var(--border-soft);
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .phase-block:last-child { border-bottom: none; margin-bottom: 0; }
+  .phase-block.visible { opacity: 1; transform: translateY(0); }
+
+  .phase-header { margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border-soft); }
+
+  .phase-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .phase-number { font-family: 'DM Serif Display', serif; font-size: 44px; line-height: 1; color: var(--border); user-select: none; }
+
+  .status-badge { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--border); color: var(--ink-faint); border-radius: 2px; }
+  .status-badge.active { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+
+  .phase-tag { display: inline-flex; align-items: center; gap: 7px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
+  .phase-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+  .phase-title { font-family: 'DM Serif Display', serif; font-size: 21px; font-weight: 400; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
+  .phase-period { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-faint); letter-spacing: 0.08em; }
+
+  /* ══ TASKS — single col mobile ══ */
+  .tasks-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+  .task-card {
+    border: 1px solid var(--border-soft);
+    padding: 14px 16px;
+    background: var(--paper);
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .task-card::before { content: ''; position: absolute; top: 0; left: 0; width: 2px; height: 0; background: var(--ink); transition: height 0.3s ease; }
+  .task-card.done { background: var(--paper-cool); }
+  .task-card.done::before { height: 100%; background: var(--border); }
+
+  .task-check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 5px; }
+  .check-box {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 2px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; user-select: none; margin-top: 2px;
+    cursor: pointer;
+  }
+  .check-box.checked { background: var(--ink); border-color: var(--ink); }
+  .check-box.checked::after {
+    content: '';
+    width: 5px; height: 3px;
+    border-left: 1.5px solid var(--paper);
+    border-bottom: 1.5px solid var(--paper);
+    transform: rotate(-45deg) translateY(-1px);
+    display: block;
+  }
+  .task-name { font-size: 13px; color: var(--ink-soft); font-weight: 400; line-height: 1.45; }
+  .task-name.checked-text { color: var(--ink-faint); text-decoration: line-through; text-decoration-color: var(--border); }
+  .task-desc { font-size: 11.5px; color: var(--ink-faint); line-height: 1.6; padding-left: 26px; }
+
+  .phase-note { display: flex; gap: 12px; padding: 14px 16px; border: 1px solid var(--border-soft); background: var(--paper-cool); font-size: 12px; color: var(--ink-muted); line-height: 1.7; }
+  .note-icon { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--ink-faint); flex-shrink: 0; letter-spacing: 0.1em; padding-top: 2px; }
+
+  .dot1 { background: #0a0a0a; } .dot2 { background: #555; } .dot3 { background: #0a0a0a; }
+  .dot4 { background: #333; } .dot5 { background: #0a0a0a; } .dot6 { background: #aaa; }
+
+  /* ══ FOOTER ══ */
+  footer { border-top: 1px solid var(--border); padding: 24px 20px; text-align: center; }
+  .footer-left { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 4px; }
+  .footer-right { font-size: 11px; color: var(--ink-faint); }
+
+  /* ══════════════════════════════
+     TABLET 640px+
+  ══════════════════════════════ */
+  @media (min-width: 640px) {
+    header { padding: 44px 40px 32px; }
+    h1 { font-size: 42px; }
+    .subtitle { max-width: 480px; }
+    .stats-grid { max-width: 300px; }
+    .stat { padding: 14px 12px; }
+    .stat-number { font-size: 24px; }
+
+    .progress-bar-section { padding: 22px 40px; }
+    .countdown-section { padding: 32px 40px; }
+    .unit-number { font-size: 34px; }
+    .completion-bar { padding: 14px 40px; }
+    .timeline-content { padding: 32px 40px; }
+
+    .tasks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .phase-title { font-size: 23px; }
+    .phase-number { font-size: 52px; }
+
+    footer { padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+    .footer-left { margin-bottom: 0; }
+  }
+
+  /* ══════════════════════════════
+     DESKTOP 1024px+
+  ══════════════════════════════ */
+  @media (min-width: 1024px) {
+    header {
+      padding: 80px 80px 60px;
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 40px;
+    }
+    .header-left { max-width: 560px; }
+    h1 { font-size: clamp(36px, 3.5vw, 52px); margin-bottom: 16px; }
+    .subtitle { font-size: 14px; margin-bottom: 0; }
+    .header-right { flex-shrink: 0; }
+    .stats-grid { max-width: none; grid-template-columns: 1fr 1fr; }
+    .stat { padding: 20px 24px; }
+    .stat-number { font-size: 28px; }
+    .stat-label { font-size: 9px; }
+
+    .progress-bar-section { padding: 32px 80px; gap: 24px; }
+    .progress-percent { font-size: 18px; }
+    .month-marker { font-size: 8px; }
+
+    .countdown-section {
+      padding: 48px 80px;
+      display: flex; align-items: center; justify-content: space-between; gap: 40px;
+    }
+    .countdown-left { margin-bottom: 0; }
+    .countdown-title { font-size: 20px; }
+    .countdown-units { display: flex; gap: 1px; margin-bottom: 0; }
+    .countdown-unit { min-width: 88px; padding: 20px 24px; }
+    .unit-number { font-size: 40px; }
+    .countdown-urgency { flex-direction: column; align-items: flex-end; gap: 0; }
+    .urgency-bar-wrap { width: 160px; flex: none; }
+    .urgency-pct { font-size: 26px; margin-top: 6px; }
+
+    .completion-bar { padding: 22px 80px; }
+
+    .mobile-nav { display: none; }
+    .stack-section { display: none; }
+
+    .page-body { display: grid; grid-template-columns: 256px 1fr; }
+
+    aside {
+      display: block;
+      border-right: 1px solid var(--border);
+      padding: 48px 32px;
+      position: sticky; top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    aside::-webkit-scrollbar { display: none; }
+
+    .aside-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 20px; display: block; }
+    .nav-phases { list-style: none; }
+    .nav-phase { margin-bottom: 3px; }
+    .nav-phase a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 12px;
+      text-decoration: none; color: var(--ink-muted); font-size: 12px; font-weight: 300;
+      border-radius: 2px; transition: all 0.2s; border: 1px solid transparent;
+    }
+    .nav-phase a:hover, .nav-phase a.active { color: var(--ink); background: var(--paper-cool); border-color: var(--border); }
+    .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.2s; }
+    .nav-phase a:hover .nav-dot, .nav-phase a.active .nav-dot { background: var(--ink); }
+    .nav-month { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--ink-faint); margin-left: auto; }
+    .sidebar-divider { border: none; border-top: 1px solid var(--border-soft); margin: 22px 0; }
+    .sidebar-stack .aside-label { margin-bottom: 12px; }
+    .sidebar-stack .stack-item { font-size: 11px; padding: 7px 0; }
+    .sidebar-stack .stack-badge { font-size: 8px; }
+
+    .timeline-content { padding: 48px 64px; }
+    .phase-block { margin-bottom: 76px; padding-bottom: 76px; }
+
+    .phase-header {
+      display: flex; align-items: flex-start; gap: 24px;
+      margin-bottom: 32px;
+    }
+    .phase-top-row { display: contents; }
+    .phase-meta { flex: 1; }
+    .phase-status { margin-left: auto; }
+    .phase-number { font-size: 64px; }
+    .phase-title { font-size: 26px; }
+
+    footer { padding: 40px 80px; }
+  }
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <p class="eyebrow">Research Timeline · S1 Teknik Informatika</p>
+    <h1>Hexapod<br><em>Reinforcement</em><br>Learning</h1>
+    <p class="subtitle">Pelatihan kebijakan gerak robot hexapod menggunakan algoritma PPO pada terrain tidak rata dengan pendekatan sim-to-real transfer.</p>
+  </div>
+  <div class="header-right">
+    <div class="stats-grid">
+      <div class="stat"><span class="stat-number">12</span><span class="stat-label">Bulan</span></div>
+      <div class="stat"><span class="stat-number">6</span><span class="stat-label">Fase</span></div>
+      <div class="stat"><span class="stat-number">18</span><span class="stat-label">DOF</span></div>
+      <div class="stat"><span class="stat-number" id="task-total">0</span><span class="stat-label">Tasks</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar-section">
+  <span class="progress-label">Timeline</span>
+  <div class="progress-track">
+    <div class="month-markers">
+      <span class="month-marker">M1</span><span class="month-marker">M3</span><span class="month-marker">M5</span>
+      <span class="month-marker">M7</span><span class="month-marker">M9</span><span class="month-marker">M11</span><span class="month-marker">M12</span>
+    </div>
+    <div class="progress-fill" id="timeline-progress"></div>
+  </div>
+  <span class="progress-percent" id="progress-text">0%</span>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="countdown-section">
+  <div class="countdown-left">
+    <p class="eyebrow">Target Seminar Hasil</p>
+    <div class="countdown-title">April 2027</div>
+    <div class="countdown-subtitle">Semester 8 · Deadline Semhas</div>
+  </div>
+  <div class="countdown-units">
+    <div class="countdown-unit"><span class="unit-number" id="cd-days">—</span><span class="unit-label">Hari</span></div>
+    <div class="countdown-unit"><span class="unit-number" id="cd-hours">—</span><span class="unit-label">Jam</span></div>
+    <div class="countdown-unit"><span class="unit-number" id="cd-minutes">—</span><span class="unit-label">Menit</span></div>
+    <div class="countdown-unit"><span class="unit-number" id="cd-seconds">—</span><span class="unit-label">Detik</span></div>
+  </div>
+  <div class="countdown-urgency">
+    <div class="urgency-bar-wrap">
+      <span class="urgency-label">Waktu Terpakai</span>
+      <div class="urgency-track"><div class="urgency-fill" id="urgency-fill" style="width:0%"></div></div>
+    </div>
+    <div class="urgency-right">
+      <span class="urgency-pct" id="urgency-pct">0%</span>
+      <span class="urgency-pct-label">dari 14 bulan</span>
+    </div>
+  </div>
+</div>
+
+<!-- TASK COMPLETION -->
+<div class="completion-bar">
+  <span class="completion-label">Tasks</span>
+  <div class="completion-track"><div class="completion-fill" id="completion-fill" style="width:0%"></div></div>
+  <span class="completion-count" id="completion-count">0 / 0</span>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="#fase-1" class="mobile-nav-item active">01 Fondasi</a>
+    <a href="#fase-2" class="mobile-nav-item">02 Simulasi</a>
+    <a href="#fase-3" class="mobile-nav-item">03 Training</a>
+    <a href="#fase-4" class="mobile-nav-item">04 Sim-to-Real</a>
+    <a href="#fase-5" class="mobile-nav-item">05 Finalisasi</a>
+    <a href="#fase-6" class="mobile-nav-item">06 Buffer</a>
+  </div>
+</nav>
+
+<!-- STACK ACCORDION (mobile) -->
+<div class="stack-section">
+  <button class="stack-toggle" onclick="toggleStack(this)">Tech Stack <span class="stack-chevron">▾</span></button>
+  <div class="stack-items">
+    <div class="stack-item"><span class="stack-name">PyBullet</span><span class="stack-badge">Simulasi</span></div>
+    <div class="stack-item"><span class="stack-name">Stable-Baselines3</span><span class="stack-badge">RL</span></div>
+    <div class="stack-item"><span class="stack-name">Gymnasium</span><span class="stack-badge">Env</span></div>
+    <div class="stack-item"><span class="stack-name">PyTorch</span><span class="stack-badge">DL</span></div>
+    <div class="stack-item"><span class="stack-name">ONNX Runtime</span><span class="stack-badge">Deploy</span></div>
+    <div class="stack-item"><span class="stack-name">Raspberry Pi 4</span><span class="stack-badge">Inference</span></div>
+    <div class="stack-item"><span class="stack-name">Arduino ATmega</span><span class="stack-badge">Aktuator</span></div>
+    <div class="stack-item"><span class="stack-name">MPU6050</span><span class="stack-badge">IMU</span></div>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+  <aside>
+    <span class="aside-label">Navigasi</span>
+    <ul class="nav-phases">
+      <li class="nav-phase"><a href="#fase-1" class="active"><span class="nav-dot"></span>Fondasi + Hardware<span class="nav-month">M1–2</span></a></li>
+      <li class="nav-phase"><a href="#fase-2"><span class="nav-dot"></span>Environment<span class="nav-month">M3–4</span></a></li>
+      <li class="nav-phase"><a href="#fase-3"><span class="nav-dot"></span>Training & Eksperimen<span class="nav-month">M5–7</span></a></li>
+      <li class="nav-phase"><a href="#fase-4"><span class="nav-dot"></span>Sim-to-Real<span class="nav-month">M8–9</span></a></li>
+      <li class="nav-phase"><a href="#fase-5"><span class="nav-dot"></span>Evaluasi & Penulisan<span class="nav-month">M10–11</span></a></li>
+      <li class="nav-phase"><a href="#fase-6"><span class="nav-dot"></span>Buffer<span class="nav-month">M12</span></a></li>
+    </ul>
+    <hr class="sidebar-divider">
+    <div class="sidebar-stack">
+      <span class="aside-label">Tech Stack</span>
+      <div class="stack-item"><span class="stack-name">PyBullet</span><span class="stack-badge">Simulasi</span></div>
+      <div class="stack-item"><span class="stack-name">Stable-Baselines3</span><span class="stack-badge">RL</span></div>
+      <div class="stack-item"><span class="stack-name">Gymnasium</span><span class="stack-badge">Env</span></div>
+      <div class="stack-item"><span class="stack-name">PyTorch</span><span class="stack-badge">DL</span></div>
+      <div class="stack-item"><span class="stack-name">ONNX Runtime</span><span class="stack-badge">Deploy</span></div>
+      <div class="stack-item"><span class="stack-name">Raspberry Pi 4</span><span class="stack-badge">Inference</span></div>
+      <div class="stack-item"><span class="stack-name">Arduino ATmega</span><span class="stack-badge">Aktuator</span></div>
+      <div class="stack-item"><span class="stack-name">MPU6050</span><span class="stack-badge">IMU</span></div>
+    </div>
+  </aside>
+
+  <div class="timeline-content">
+
+    <!-- FASE 1 -->
+    <div class="phase-block" id="fase-1">
+      <div class="phase-header">
+        <div class="phase-top-row"><div class="phase-number">01</div><div class="phase-status"><span class="status-badge active">Current</span></div></div>
+        <div class="phase-meta">
+          <div class="phase-tag"><span class="phase-dot dot1"></span>Fondasi</div>
+          <div class="phase-title">Rakit Hardware +<br>Pelajari Tools Dasar</div>
+          <div class="phase-period">Bulan 1 – 2</div>
+        </div>
+      </div>
+      <div class="tasks-grid">
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Rakit hardware hexapod</span></div><div class="task-desc">Prioritas utama. Pasang 18 servo WP23KG, frame, kabel, dan power supply LiPo.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Ukur spesifikasi fisik robot</span></div><div class="task-desc">Catat panjang tiap link, range sudut servo, distribusi berat untuk pembuatan URDF.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Pelajari konsep dasar RL</span></div><div class="task-desc">Pahami reward, state, action, policy, episode. Bisa dari YouTube (David Silver).</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Coba Gymnasium + SB3</span></div><div class="task-desc">Latih PPO di environment sederhana (CartPole, HalfCheetah) sebagai warm-up.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Setup komunikasi Raspi–Arduino</span></div><div class="task-desc">Uji serial communication: Raspberry Pi 4 → Arduino ATmega → servo test.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Mulai Bab 1 & 2</span></div><div class="task-desc">Tulis pendahuluan dan tinjauan pustaka. Kumpulkan minimal 15 jurnal referensi.</div></div>
+      </div>
+      <div class="phase-note"><span class="note-icon">NOTE</span><span>Hardware dan studi literatur berjalan paralel. Manfaatkan waktu rakit untuk baca jurnal dan tonton video pembelajaran RL.</span></div>
+    </div>
+
+    <!-- FASE 2 -->
+    <div class="phase-block" id="fase-2">
+      <div class="phase-header">
+        <div class="phase-top-row"><div class="phase-number">02</div><div class="phase-status"><span class="status-badge">Upcoming</span></div></div>
+        <div class="phase-meta">
+          <div class="phase-tag"><span class="phase-dot dot2"></span>Simulasi</div>
+          <div class="phase-title">Bangun Environment<br>Simulasi PyBullet</div>
+          <div class="phase-period">Bulan 3 – 4</div>
+        </div>
+      </div>
+      <div class="tasks-grid">
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Buat/adaptasi model URDF</span></div><div class="task-desc">Model URDF hexapod 18-DOF berdasarkan spesifikasi hardware nyata.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Buat custom Gymnasium env</span></div><div class="task-desc">Implementasi environment hexapod dengan PyBullet sebagai physics engine.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Rancang terrain tidak rata</span></div><div class="task-desc">Implementasi random heightmap dengan domain randomization untuk generalisasi.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Definisikan state space</span></div><div class="task-desc">Orientasi tubuh (roll/pitch/yaw), angular velocity, sudut 18 joint, arah target.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Definisikan action space</span></div><div class="task-desc">Continuous: delta sudut target untuk 18 servo secara bersamaan.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Rancang reward function v1</span></div><div class="task-desc">Forward reward + stability reward + survival reward + energy penalty.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Lanjutkan Bab 3</span></div><div class="task-desc">Tulis metodologi penelitian secara detail bersamaan dengan implementasi.</div></div>
+      </div>
+      <div class="phase-note"><span class="note-icon">NOTE</span><span>Kualitas URDF sangat menentukan keberhasilan sim-to-real. Pastikan dimensi dan massa sesuai hardware nyata.</span></div>
+    </div>
+
+    <!-- FASE 3 -->
+    <div class="phase-block" id="fase-3">
+      <div class="phase-header">
+        <div class="phase-top-row"><div class="phase-number">03</div><div class="phase-status"><span class="status-badge">Upcoming</span></div></div>
+        <div class="phase-meta">
+          <div class="phase-tag"><span class="phase-dot dot3"></span>Inti Penelitian</div>
+          <div class="phase-title">Training & Eksperimen<br>Algoritma PPO</div>
+          <div class="phase-period">Bulan 5 – 7</div>
+        </div>
+      </div>
+      <div class="tasks-grid">
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Training PPO pertama</span></div><div class="task-desc">Jalankan training awal, observasi apakah agent bisa berdiri dan bergerak maju.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Iterasi reward function</span></div><div class="task-desc">Tuning bobot reward berdasarkan perilaku agent. Ini proses paling iteratif.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Hyperparameter tuning</span></div><div class="task-desc">Eksperimen learning rate, clip range, n_steps, entropy coefficient.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Analisis learning curve</span></div><div class="task-desc">Monitor konvergensi reward, value loss, policy loss via TensorBoard.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Uji domain randomization</span></div><div class="task-desc">Evaluasi kemampuan generalisasi kebijakan terhadap variasi terrain berbeda.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Dokumentasi eksperimen</span></div><div class="task-desc">Catat setiap konfigurasi, hasil, dan observasi. Ini bahan utama Bab 4.</div></div>
+      </div>
+      <div class="phase-note"><span class="note-icon">⚠ KEY</span><span>Ini fase terberat. Wajar jika reward function perlu direvisi 5–10 kali. Iterasi adalah prosesnya, bukan kegagalan.</span></div>
+    </div>
+
+    <!-- FASE 4 -->
+    <div class="phase-block" id="fase-4">
+      <div class="phase-header">
+        <div class="phase-top-row"><div class="phase-number">04</div><div class="phase-status"><span class="status-badge">Upcoming</span></div></div>
+        <div class="phase-meta">
+          <div class="phase-tag"><span class="phase-dot dot4"></span>Validasi</div>
+          <div class="phase-title">Sim-to-Real Transfer<br>& Uji Hardware</div>
+          <div class="phase-period">Bulan 8 – 9</div>
+        </div>
+      </div>
+      <div class="tasks-grid">
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Export model ke ONNX</span></div><div class="task-desc">Konversi model PyTorch hasil training ke format ONNX untuk deployment.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Deploy ke Raspberry Pi 4</span></div><div class="task-desc">Setup ONNX Runtime di Raspi, uji inferensi dan latency real-time.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Integrasi Raspi → Arduino</span></div><div class="task-desc">Kirim output model (sudut 18 servo) dari Raspi ke Arduino via serial.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Uji coba terrain nyata</span></div><div class="task-desc">Deploy robot di terrain tidak rata. Rekam video dan data IMU untuk analisis.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Analisis sim-to-real gap</span></div><div class="task-desc">Bandingkan performa di simulasi vs hardware nyata secara kuantitatif.</div></div>
+      </div>
+      <div class="phase-note"><span class="note-icon">NOTE</span><span>Sim-to-real gap adalah hal yang normal. Jika robot tidak langsung sempurna, itu bagian dari temuan penelitianmu.</span></div>
+    </div>
+
+    <!-- FASE 5 -->
+    <div class="phase-block" id="fase-5">
+      <div class="phase-header">
+        <div class="phase-top-row"><div class="phase-number">05</div><div class="phase-status"><span class="status-badge">Upcoming</span></div></div>
+        <div class="phase-meta">
+          <div class="phase-tag"><span class="phase-dot dot5"></span>Finalisasi</div>
+          <div class="phase-title">Evaluasi Menyeluruh<br>& Penulisan Skripsi</div>
+          <div class="phase-period">Bulan 10 – 11</div>
+        </div>
+      </div>
+      <div class="tasks-grid">
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Evaluasi performa akhir</span></div><div class="task-desc">Kecepatan gerak, stabilitas IMU, success rate melewati terrain berbatu.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Selesaikan Bab 4</span></div><div class="task-desc">Hasil & Pembahasan: learning curve, analisis reward function, sim-to-real gap.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Selesaikan Bab 5</span></div><div class="task-desc">Kesimpulan dan saran penelitian lanjutan.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Revisi keseluruhan naskah</span></div><div class="task-desc">Cek konsistensi, format, sitasi. Minta feedback dosen pembimbing.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Persiapan sidang</span></div><div class="task-desc">Buat slide presentasi, latihan Q&A, siapkan demo video robot.</div></div>
+      </div>
+      <div class="phase-note"><span class="note-icon">NOTE</span><span>Mulai tulis setiap bab dari awal penelitian. Penulisan paralel sangat menghemat waktu di fase ini.</span></div>
+    </div>
+
+    <!-- FASE 6 -->
+    <div class="phase-block" id="fase-6">
+      <div class="phase-header">
+        <div class="phase-top-row"><div class="phase-number">06</div><div class="phase-status"><span class="status-badge">Buffer</span></div></div>
+        <div class="phase-meta">
+          <div class="phase-tag"><span class="phase-dot dot6"></span>Kontigensi</div>
+          <div class="phase-title">Cadangan Waktu</div>
+          <div class="phase-period">Bulan 12</div>
+        </div>
+      </div>
+      <div class="tasks-grid">
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Revisi pasca seminar</span></div><div class="task-desc">Perbaikan berdasarkan feedback dosen penguji.</div></div>
+        <div class="task-card"><div class="task-check"><div class="check-box" onclick="toggleTask(this)"></div><span class="task-name">Perbaikan bug tak terduga</span></div><div class="task-desc">Cadangan untuk masalah hardware, software, atau hasil yang tidak sesuai ekspektasi.</div></div>
+      </div>
+      <div class="phase-note"><span class="note-icon">⚠ PENTING</span><span>Jangan isi fase ini dengan hal lain. Ini safety net. Selesai lebih awal? Gunakan untuk mempoles kualitas penelitian.</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">Hexapod RL Research · S1 Teknik Informatika · Komputer Cerdas Visual</div>
+  <div class="footer-right">PPO · PyBullet · Sim-to-Real</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  if (cursor && window.matchMedia('(hover: hover)').matches) {
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = (e.clientX - 4) + 'px';
+      cursor.style.top = (e.clientY - 4) + 'px';
+    });
+    document.querySelectorAll('a, .check-box, .task-card, .stack-toggle').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+    });
+  }
+
+  // Countdown
+  function updateCountdown() {
+    const target = new Date('2027-04-01T08:00:00');
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) return;
+    document.getElementById('cd-days').textContent = String(Math.floor(diff / 86400000)).padStart(3,'0');
+    document.getElementById('cd-hours').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0');
+    document.getElementById('cd-minutes').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+    document.getElementById('cd-seconds').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+    const start = new Date('2026-02-22T00:00:00');
+    const pct = Math.min(100, Math.round(((now - start) / (target - start)) * 100));
+    document.getElementById('urgency-fill').style.width = pct + '%';
+    document.getElementById('urgency-pct').textContent = pct + '%';
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Progress bar
+  setTimeout(() => {
+    document.getElementById('timeline-progress').style.width = '8%';
+    document.getElementById('progress-text').textContent = '8%';
+  }, 600);
+
+  // Tasks
+  const allBoxes = document.querySelectorAll('.check-box');
+  document.getElementById('task-total').textContent = allBoxes.length;
+  document.getElementById('completion-count').textContent = '0 / ' + allBoxes.length;
+
+  function toggleTask(el) {
+    el.classList.toggle('checked');
+    el.closest('.task-check').querySelector('.task-name').classList.toggle('checked-text');
+    el.closest('.task-card').classList.toggle('done');
+    const checked = document.querySelectorAll('.check-box.checked').length;
+    const pct = Math.round((checked / allBoxes.length) * 100);
+    document.getElementById('completion-fill').style.width = pct + '%';
+    document.getElementById('completion-count').textContent = checked + ' / ' + allBoxes.length;
+    document.getElementById('timeline-progress').style.width = Math.max(8, pct) + '%';
+    document.getElementById('progress-text').textContent = Math.max(8, pct) + '%';
+  }
+
+  // Stack accordion
+  function toggleStack(btn) {
+    btn.classList.toggle('open');
+    btn.nextElementSibling.classList.toggle('open');
+  }
+
+  // Fade-in on scroll
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.phase-block').forEach((b, i) => {
+    b.style.transitionDelay = (i * 0.05) + 's';
+    obs.observe(b);
+  });
+
+  // Active nav
+  const navObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const id = e.target.id;
+      document.querySelectorAll('.nav-phase a, .mobile-nav-item').forEach(l => l.classList.remove('active'));
+      const dl = document.querySelector('.nav-phase a[href="#' + id + '"]');
+      const ml = document.querySelector('.mobile-nav-item[href="#' + id + '"]');
+      if (dl) dl.classList.add('active');
+      if (ml) ml.classList.add('active');
+    });
+  }, { threshold: 0.25 });
+  document.querySelectorAll('.phase-block').forEach(b => navObs.observe(b));
+</script>
+</body>
+</html>
